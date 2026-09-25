@@ -1,0 +1,112 @@
+# Local development stack (V1–V6).
+# PostgreSQL is the source of truth. Neo4j (V6) holds a projection of it — the knowledge graph — and can be dropped
+# and rebuilt at any time; if it is down, only the Knowledge graph page is affected.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medflow}
+      POSTGRES_DB: ${POSTGRES_DB:-medflow}
+    # Not published on the host by default (avoids clashing with a local PostgreSQL on 5432).
+    # Uncomment to connect with a DB client:  - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medflow} -d ${POSTGRES_DB:-medflow}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      # Password comes from .env (start.sh / start-windows.bat create it from .env.example). Min. 8 characters.
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env (copy .env.example)}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    # Browser UI / Bolt not published by default. Uncomment to explore the graph at http://localhost:7474
+    # ports: ["7474:7474", "7687:7687"]
+    volumes:
+      - neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$$NEO4J_PASSWORD\" 'RETURN 1' >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow}@postgres:5432/${POSTGRES_DB:-medflow}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-0f3c9a7e5b1d4c2a}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      TRAIN_ON_START: ${TRAIN_ON_START:-true}
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      GRAPH_BACKEND: ${GRAPH_BACKEND:-neo4j}
+      GRAPH_URL: bolt://neo4j:7687
+      GRAPH_USER: neo4j
+      GRAPH_PASSWORD: ${NEO4J_PASSWORD}
+      ASSISTANT_PROVIDER: ${ASSISTANT_PROVIDER:-none}
+      ASSISTANT_BASE_URL: ${ASSISTANT_BASE_URL:-}
+      ASSISTANT_MODEL: ${ASSISTANT_MODEL:-}
+      ASSISTANT_API_KEY: ${ASSISTANT_API_KEY:-}
+      INTEGRATION_KEY_PEPPER: ${INTEGRATION_KEY_PEPPER:-}
+      REFERENCE_ERP_ENABLED: ${REFERENCE_ERP_ENABLED:-false}
+      REFERENCE_ERP_TOKEN: ${REFERENCE_ERP_TOKEN:-}
+      REFERENCE_ERP_BASE_URL: ${REFERENCE_ERP_BASE_URL:-http://localhost:8000}
+      INTEGRATION_ALLOWED_HOSTS: ${INTEGRATION_ALLOWED_HOSTS:-[]}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  # V9 — scheduled data feeds: every 5 minutes, sync the rest_pull sources whose schedule has elapsed.
+  integrations-scheduler:
+    build: ./backend
+    entrypoint: ["sh", "-c"]
+    command: ["while true; do python -m app.integrations.cli run-due || true; sleep 300; done"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-medflow}:${POSTGRES_PASSWORD:-medflow}@postgres:5432/${POSTGRES_DB:-medflow}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-0f3c9a7e5b1d4c2a}
+      GRAPH_BACKEND: ${GRAPH_BACKEND:-neo4j}
+      GRAPH_URL: bolt://neo4j:7687
+      GRAPH_USER: neo4j
+      GRAPH_PASSWORD: ${NEO4J_PASSWORD}
+      INTEGRATION_KEY_PEPPER: ${INTEGRATION_KEY_PEPPER:-}
+      REFERENCE_ERP_ENABLED: ${REFERENCE_ERP_ENABLED:-false}
+      REFERENCE_ERP_TOKEN: ${REFERENCE_ERP_TOKEN:-}
+      REFERENCE_ERP_BASE_URL: http://backend:8000
+      INTEGRATION_ALLOWED_HOSTS: ${INTEGRATION_ALLOWED_HOSTS:-[]}
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BACKEND_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  neo4jdata:

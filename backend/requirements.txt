@@ -1,0 +1,21 @@
+fastapi[standard]==0.141.1
+SQLAlchemy==2.0.54
+alembic==1.20.0
+psycopg[binary]==3.3.6
+pydantic==2.13.3
+pydantic-settings==2.14.0
+email-validator==2.3.0
+PyJWT==2.12.1
+bcrypt==5.0.0
+uvicorn==0.46.0
+# V2 — demand forecasting
+numpy==2.4.4
+pandas==3.0.2
+xgboost-cpu==3.2.0
+# V5 — procurement optimisation (scenario selection)
+ortools==9.15.6755
+# V6 — knowledge graph clients (Neo4j in production; FalkorDB = openCypher engine for development/tests)
+neo4j==6.3.1
+falkordb==1.7.1
+# V9 — Excel (.xlsx) imports
+openpyxl==3.1.5
