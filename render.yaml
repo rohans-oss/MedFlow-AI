@@ -1,0 +1,51 @@
+# Render Blueprint: PostgreSQL + the FastAPI backend. The Next.js frontend is deployed on Vercel (see docs/deployment.md).
+# Render dashboard → New → Blueprint → pick this repository.
+databases:
+  - name: medflow-db
+    plan: free            # free PostgreSQL expires after 30 days on Render; use basic-256mb to keep it
+    databaseName: medflow
+    user: medflow
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: medflow-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    # Starter (0.5 CPU) seeds + trains the demo in minutes. "free" (0.1 CPU, sleeps after 15 min idle) works for the
+    # API but the first-start demo seed/training may take very long or be interrupted by the idle spin-down.
+    plan: starter
+    region: singapore
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medflow-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INTEGRATION_KEY_PEPPER
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      # Synthetic demo hospitals (clearly labelled in the UI). Set to false for a real deployment.
+      - key: SEED_DEMO
+        value: "true"
+      - key: TRAIN_ON_START
+        value: "true"
+      - key: BOOTSTRAP_IN_BACKGROUND
+        value: "true"
+      # No Neo4j on Render: only the Knowledge graph page is unavailable. Point GRAPH_URL at Neo4j AuraDB to enable it.
+      - key: GRAPH_BACKEND
+        value: disabled
+      - key: ASSISTANT_PROVIDER
+        value: none
+      - key: REFERENCE_ERP_ENABLED
+        value: "false"
+      - key: CORS_ORIGINS
+        value: '["https://medflow-ai.vercel.app"]'

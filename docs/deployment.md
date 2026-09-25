@@ -4,6 +4,20 @@
 
 `docker compose up --build` — see README.
 
+## Hosted demo: Render (API + PostgreSQL) + Vercel (frontend)
+
+1. **Render** → New → Blueprint → this repository. `render.yaml` creates `medflow-db` (PostgreSQL 16) and `medflow-api`
+   (the backend Docker image; migrations run on start, the synthetic demo is seeded and trained in the background, so
+   the demo logins work a few minutes after the first deploy). The knowledge graph is `disabled` there (no Neo4j).
+2. **Vercel** → Add New → Project → this repository, **Root Directory = `frontend`**, environment variable
+   `BACKEND_URL=https://<medflow-api>.onrender.com` (no trailing slash). Deploy. Redeploy after changing it — it is baked
+   into the rewrites at build time.
+3. If the Vercel URL is not `https://medflow-ai.vercel.app`, update `CORS_ORIGINS` on Render (only needed for direct
+   cross-origin API calls; the app itself goes through the Vercel `/api` rewrite).
+
+Demo logins: `admin@sunrise.demo` / `Demo@1234` (all data is synthetic). On Render's free web plan the API sleeps after
+15 idle minutes and the first request takes ~1 minute to wake it.
+
 ## Suggested hosted setup (when needed)
 
 | Component | Option | Notes |

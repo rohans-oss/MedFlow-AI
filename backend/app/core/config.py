@@ -76,6 +76,15 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be set to a random value of at least 32 characters when ENVIRONMENT=production")
         return self
 
+    @model_validator(mode="after")
+    def _use_psycopg_driver(self) -> "Settings":
+        # Managed hosts (Render, Railway, Heroku) hand out postgres:// or postgresql:// URLs; SQLAlchemy needs the driver.
+        for prefix in ("postgres://", "postgresql://"):
+            if self.DATABASE_URL.startswith(prefix):
+                self.DATABASE_URL = "postgresql+psycopg://" + self.DATABASE_URL[len(prefix):]
+                break
+        return self
+
 
 _PLACEHOLDER_SECRETS = {"change-me-in-production-use-a-long-random-string", "change-me", "dev-only-change-me-0f3c9a7e5b1d4c2a"}
 
