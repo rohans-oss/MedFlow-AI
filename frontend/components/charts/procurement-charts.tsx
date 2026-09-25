@@ -37,7 +37,7 @@ export function AvailabilityChart({ rep, unit }: { rep: ReplenishmentCalc; unit:
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as (typeof points)[number];
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="text-muted-foreground">{shortDate(p.date)} (end of day)</div>
                     <div className="mt-0.5">Without deliveries: <b>{formatNumber(Math.round(p.without_deliveries))}</b> {unit}</div>
                     {differs && <div>With in-transit (expected): <b>{formatNumber(Math.round(p.with_in_transit))}</b> {unit}</div>}
@@ -77,7 +77,7 @@ export function ScenarioCostChart({ scenarios }: { scenarios: Scenario[] }) {
                 if (!active || !payload?.length) return null;
                 const s = (payload[0].payload as (typeof data)[number]).s;
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="font-medium">{s.label}</div>
                     <div>Expected total cost <b>{money(s.costs.total)}</b></div>
                     <div className="text-muted-foreground">purchase {money(s.costs.purchase)} · stockout {money(s.costs.stockout)} · holding {money(s.costs.holding)} · expiry {money(s.costs.expiry)} · carried forward −{money(s.costs.carried_forward)}</div>

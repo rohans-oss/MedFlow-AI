@@ -15,7 +15,7 @@ const shortDate = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString("e
 
 function TooltipBox({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+    <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
       <div className="text-muted-foreground">{title}</div>
       <div className="mt-0.5 font-semibold text-foreground">{value}</div>
     </div>
@@ -92,14 +92,17 @@ export function RankedBars({
   const fmt = formatter ?? ((v: number) => (money ? formatCompactINR(v) : formatNumber(v)));
   return (
     <ul className="space-y-2.5">
-      {data.map((d) => (
+      {data.map((d, i) => (
         <li key={d.name} className="group" title={`${d.name}: ${formatter ? formatter(d.value) : money ? formatINR(d.value) : formatNumber(d.value)} ${unitLabel}`}>
           <div className="mb-1 flex justify-between gap-3 text-xs">
             <span className="truncate text-slate-700">{d.name}</span>
             <span className="shrink-0 font-medium tabular-nums">{fmt(d.value)}</span>
           </div>
-          <div className="h-2 rounded bg-slate-100">
-            <div className="h-2 rounded group-hover:opacity-80" style={{ width: `${(d.value / max) * 100}%`, background: SERIES_1 }} />
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="bar-grow h-2 rounded-full transition-opacity group-hover:opacity-80"
+              style={{ width: `${(d.value / max) * 100}%`, background: SERIES_1, animationDelay: `${i * 60}ms` }}
+            />
           </div>
         </li>
       ))}

@@ -23,15 +23,15 @@ export function DialogContent({
 }) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-[1px] data-[state=open]:animate-in" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-sm data-[state=open]:animate-fade-in" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border bg-card p-6 shadow-xl focus:outline-none",
+          "fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-white/80 bg-white/95 p-6 shadow-2xl shadow-teal-950/20 ring-1 ring-slate-900/5 backdrop-blur-xl focus:outline-none data-[state=open]:animate-scale-in",
           className,
         )}
       >
         <div className="mb-5 pr-6">
-          <DialogPrimitive.Title className="text-base font-semibold">{title}</DialogPrimitive.Title>
+          <DialogPrimitive.Title className="text-gradient text-lg font-semibold">{title}</DialogPrimitive.Title>
           {description ? (
             <DialogPrimitive.Description className="mt-1 text-sm text-muted-foreground">{description}</DialogPrimitive.Description>
           ) : (
@@ -39,7 +39,7 @@ export function DialogContent({
           )}
         </div>
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-all hover:rotate-90 hover:bg-teal-50 hover:text-teal-800" aria-label="Close">
           <X className="size-4" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>

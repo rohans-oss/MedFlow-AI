@@ -100,7 +100,7 @@ export function ForecastChart({ data, highlightDays }: { data: ItemForecast; hig
                 const p = payload[0].payload as Point;
                 const isFuture = p.band != null;
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="text-muted-foreground">{shortDate(p.date)}</div>
                     {isFuture ? (
                       <>
@@ -156,7 +156,7 @@ export function BacktestChart({ data, unit }: { data: { date: string; actual: nu
             <Tooltip
               content={({ active, payload }) =>
                 active && payload?.length ? (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="text-muted-foreground">{shortDate(payload[0].payload.date)}</div>
                     <div>Actual: <b>{payload[0].payload.actual == null ? "stocked out" : `${formatNumber(payload[0].payload.actual)} ${unit}`}</b></div>
                     <div>Predicted: <b>{formatNumber(Math.round(payload[0].payload.predicted))} {unit}</b></div>

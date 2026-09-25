@@ -7,11 +7,21 @@ import Link from "next/link";
 import { MovementBadge, RiskBadge, StockStatusBadge } from "@/components/badges";
 import { ConsumptionValueChart, RankedBars } from "@/components/charts/charts";
 import { IssueDialog, ReceiveDialog } from "@/components/forms/stock-dialogs";
-import { Button, Card, CardBody, CardHeader, EmptyState, PageHeader, Skeleton, Stat, Table, TD, TH, THead, TR } from "@/components/ui/primitives";
+import { SupplyNetworkArt, WaveArt } from "@/components/art";
+import { Button, Card, CardBody, CardHeader, EmptyState, Skeleton, Stat, Table, TD, TH, THead, TR } from "@/components/ui/primitives";
 import { PERM, useMe } from "@/hooks/use-me";
 import { get } from "@/lib/api";
 import type { DashboardSummary, ForecastOverview, RecommendationRow, RiskOverview } from "@/lib/types";
 import { formatCompactINR, formatINR, formatNumber, timeAgo } from "@/lib/utils";
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}
+
+function today() {
+  return new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+}
 
 export default function DashboardPage() {
   const { can, me } = useMe();
@@ -42,18 +52,46 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageHeader
-        title="Supply health"
-        description={me?.hospital ? `${me.hospital.name} · last 30 days` : undefined}
-        actions={
-          <>
+      <section className="relative mb-6 overflow-hidden rounded-3xl bg-brand-900 text-white shadow-xl shadow-teal-950/25 ring-1 ring-white/10">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute inset-0 bg-[radial-gradient(70%_120%_at_0%_0%,rgb(20_184_166/0.45),transparent_60%),radial-gradient(60%_120%_at_100%_100%,rgb(56_189_248/0.3),transparent_60%)]" />
+          <SupplyNetworkArt className="absolute inset-y-0 right-0 h-full w-full opacity-45 sm:w-3/4" ecg={false} />
+          <WaveArt className="absolute inset-x-0 bottom-0 h-20 w-full" />
+        </div>
+        <div className="relative flex flex-wrap items-end justify-between gap-5 p-6 sm:p-8">
+          <div className="min-w-0 max-w-2xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-teal-200/80" suppressHydrationWarning>
+              {greeting()}
+              {me?.full_name ? `, ${me.full_name.split(" ")[0]}` : ""} · {today()}
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Supply health</h1>
+            <p className="mt-2 text-sm text-teal-50/75">
+              {me?.hospital ? `${me.hospital.name} · last 30 days` : "Last 30 days"}
+              {data ? ` · ${formatNumber(data.items_monitored)} items · ${alertsTotal} open alerts` : ""}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             {can(PERM.STOCK_ISSUE, PERM.STOCK_ISSUE_OWN) && (
-              <IssueDialog trigger={<Button variant="outline"><PackageMinus /> Issue stock</Button>} />
+              <IssueDialog
+                trigger={
+                  <Button variant="outline" className="border-white/25 bg-white/10 text-white backdrop-blur hover:border-white/50 hover:bg-white/20 hover:text-white">
+                    <PackageMinus /> Issue stock
+                  </Button>
+                }
+              />
             )}
-            {can(PERM.STOCK_RECEIVE) && <ReceiveDialog trigger={<Button><PackagePlus /> Receive stock</Button>} />}
-          </>
-        }
-      />
+            {can(PERM.STOCK_RECEIVE) && (
+              <ReceiveDialog
+                trigger={
+                  <Button className="bg-gradient-to-br from-teal-300 to-cyan-400 text-brand-950 shadow-teal-400/30 hover:brightness-105">
+                    <PackagePlus /> Receive stock
+                  </Button>
+                }
+              />
+            )}
+          </div>
+        </div>
+      </section>
 
       {isLoading || !data ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,8 +100,8 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="stagger space-y-6">
+          <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat
               label="Items monitored"
               icon={<Boxes />}
@@ -118,7 +156,7 @@ export default function DashboardPage() {
               atRisk.length ? (
                 <ul className="divide-y">
                   {atRisk.map((i) => (
-                    <li key={i.consumable_id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                    <li key={i.consumable_id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 text-sm transition-colors hover:bg-teal-50/40">
                       <span className="flex min-w-0 items-center gap-2">
                         <RiskBadge level={i.risk_level} out={i.out_of_stock} />
                         <Link href={`/stockout-risks?item=${i.consumable_id}`} className="truncate hover:underline">{i.name}</Link>
@@ -194,7 +232,7 @@ export default function DashboardPage() {
                   ["EXPIRED", "Expired batches", "bg-red-400"],
                   ["EXPIRING_SOON", "Expiring soon", "bg-amber-400"],
                 ].map(([k, label, dot]) => (
-                  <Link key={k} href={`/alerts?type=${k}`} className="flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm hover:bg-muted">
+                  <Link key={k} href={`/alerts?type=${k}`} className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/60 px-3 py-2.5 text-sm transition-all hover:translate-x-0.5 hover:border-teal-300 hover:bg-white hover:shadow-md">
                     <span className="flex items-center gap-2">
                       <span className={`size-2 rounded-full ${dot}`} />
                       {label}

@@ -56,7 +56,7 @@ export function ReliabilityTrendChart({ data }: { data: SupplierDetailPerf["mont
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as (typeof points)[number];
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="text-muted-foreground">{monthLabel(p.month)} · {p.orders} orders</div>
                     <div className="mt-0.5 font-semibold">OTIF {pct(p.otif_rate)}</div>
                     <div>On time {pct(p.on_time_rate)}</div>
@@ -91,7 +91,7 @@ export function LeadTimeHistogram({ data, quoted }: { data: SupplierDetailPerf["
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as { days: number; orders: number };
-                return <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md"><b>{p.orders}</b> deliveries took {p.days} day{p.days === 1 ? "" : "s"}</div>;
+                return <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur"><b>{p.orders}</b> deliveries took {p.days} day{p.days === 1 ? "" : "s"}</div>;
               }}
             />
             <Bar dataKey="orders" fill={S1} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
@@ -118,7 +118,7 @@ export function PriceHistoryChart({ data, unit }: { data: { date: string; price:
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
               const p = payload[0].payload as { date: string; price: number };
-              return <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">{short(p.date)}: <b>₹{p.price.toFixed(2)}</b> per {unit}</div>;
+              return <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">{short(p.date)}: <b>₹{p.price.toFixed(2)}</b> per {unit}</div>;
             }}
           />
           <Line dataKey="price" type="stepAfter" stroke={S1} strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />

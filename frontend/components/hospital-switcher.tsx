@@ -57,7 +57,7 @@ export function HospitalSwitcher({ me }: { me: Me }) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="flex min-w-0 items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-sm hover:bg-muted"
+          className="flex min-w-0 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 px-2.5 py-1.5 text-left text-sm shadow-xs transition-all hover:border-teal-300 hover:bg-white hover:shadow-md"
           data-testid="hospital-switcher"
           aria-label="Switch hospital"
         >
@@ -67,7 +67,7 @@ export function HospitalSwitcher({ me }: { me: Me }) {
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content align="start" sideOffset={6} className="z-50 w-80 rounded-lg border bg-white p-1 shadow-lg">
+        <DropdownMenu.Content align="start" sideOffset={6} className="z-50 w-80 rounded-xl border border-white/80 bg-white/95 p-1 shadow-xl shadow-teal-950/15 ring-1 ring-slate-900/5 backdrop-blur-xl animate-fade-in">
           {[...byOrg.entries()].map(([org, ms]) => (
             <div key={org}>
               <div className="px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{org}</div>

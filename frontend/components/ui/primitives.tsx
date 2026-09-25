@@ -7,14 +7,15 @@ import { cn } from "@/lib/utils";
 /* ---------------- Button ---------------- */
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-teal-800 shadow-sm",
-        outline: "border bg-card hover:bg-muted",
-        ghost: "hover:bg-muted",
-        danger: "bg-danger text-white hover:bg-red-700",
+        default:
+          "btn-shine bg-gradient-to-br from-teal-600 to-cyan-700 text-primary-foreground shadow-md shadow-teal-900/20 hover:shadow-lg hover:shadow-teal-700/30 hover:brightness-110",
+        outline: "border border-slate-200 bg-white/80 backdrop-blur hover:border-teal-300 hover:bg-teal-50/60 hover:text-teal-900 shadow-xs",
+        ghost: "hover:bg-teal-50/70 hover:text-teal-900",
+        danger: "btn-shine bg-gradient-to-br from-red-500 to-rose-700 text-white shadow-md shadow-red-900/20 hover:brightness-110",
         subtle: "bg-accent text-primary hover:bg-emerald-100",
       },
       size: {
@@ -45,7 +46,7 @@ Button.displayName = "Button";
 /* ---------------- Inputs ---------------- */
 
 const fieldBase =
-  "w-full rounded-lg border bg-card px-3 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60";
+  "w-full rounded-lg border border-slate-200 bg-white/90 px-3 text-sm shadow-xs transition-[border-color,box-shadow] duration-200 placeholder:text-muted-foreground hover:border-slate-300 focus-visible:border-teal-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/15 disabled:opacity-60";
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => <input ref={ref} className={cn(fieldBase, "h-9", className)} {...props} />,
@@ -103,7 +104,7 @@ export function Field({
 /* ---------------- Card ---------------- */
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("min-w-0 rounded-xl border bg-card shadow-xs", className)} {...props} />;
+  return <div className={cn("card-surface min-w-0 rounded-2xl border border-white/80 ring-1 ring-slate-900/5", className)} {...props} />;
 }
 
 export function CardHeader({
@@ -118,12 +119,15 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-start justify-between gap-4 border-b px-5 py-4", className)}>
-      <div>
-        <h3 className="text-sm font-semibold">{title}</h3>
+    <div className={cn("flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-slate-200/70 px-5 py-4", className)}>
+      <div className="min-w-0 flex-1 basis-56">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+          <span className="h-3.5 w-1 shrink-0 rounded-full bg-gradient-to-b from-teal-400 to-cyan-600" aria-hidden />
+          {title}
+        </h3>
         {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
       </div>
-      {action}
+      {action && <div className="max-w-full">{action}</div>}
     </div>
   );
 }
@@ -167,13 +171,13 @@ export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTab
   );
 }
 export function THead(props: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className="border-b bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground" {...props} />;
+  return <thead className="border-b border-slate-200/70 bg-slate-50/70 text-left text-[11px] uppercase tracking-wider text-muted-foreground" {...props} />;
 }
 export function TH({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return <th className={cn("px-4 py-2.5 font-medium whitespace-nowrap", className)} {...props} />;
 }
 export function TR({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cn("border-b last:border-0 hover:bg-muted/40", className)} {...props} />;
+  return <tr className={cn("border-b border-slate-100 transition-colors last:border-0 hover:bg-teal-50/40", className)} {...props} />;
 }
 export function TD({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return <td className={cn("px-4 py-2.5 align-middle", className)} {...props} />;
@@ -182,12 +186,17 @@ export function TD({ className, ...props }: React.TdHTMLAttributes<HTMLTableCell
 /* ---------------- Misc ---------------- */
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-slate-200/70", className)} />;
+  return <div className={cn("skeleton-shimmer animate-shimmer rounded-xl", className)} />;
 }
 
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center gap-2 px-6 py-14 text-center animate-fade-in">
+      <span className="mb-1 flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-100 text-teal-700 ring-1 ring-teal-200/60" aria-hidden>
+        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 12h4l2-5 4 10 2-5h6" />
+        </svg>
+      </span>
       <p className="text-sm font-medium">{title}</p>
       {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
       {action && <div className="mt-2">{action}</div>}
@@ -206,14 +215,22 @@ export function PageHeader({
 }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      <div className="min-w-0">
+        <h1 className="text-gradient text-2xl font-semibold tracking-tight">{title}</h1>
+        <div className="mt-2 h-1 w-14 rounded-full bg-gradient-to-r from-teal-400 via-cyan-500 to-sky-400 bar-grow" aria-hidden />
+        {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   );
 }
+
+const STAT_TONES = {
+  default: { value: "text-slate-900", chip: "from-teal-500 to-cyan-600 shadow-teal-600/30", glow: "from-teal-400/25" },
+  red: { value: "text-red-600", chip: "from-rose-500 to-red-600 shadow-red-600/30", glow: "from-rose-400/25" },
+  amber: { value: "text-amber-600", chip: "from-amber-400 to-orange-500 shadow-amber-600/30", glow: "from-amber-300/30" },
+  green: { value: "text-emerald-600", chip: "from-emerald-400 to-teal-600 shadow-emerald-600/30", glow: "from-emerald-300/25" },
+} as const;
 
 export function Stat({
   label,
@@ -228,15 +245,20 @@ export function Stat({
   tone?: "default" | "red" | "amber" | "green";
   icon?: React.ReactNode;
 }) {
-  const toneCls = { default: "text-foreground", red: "text-red-600", amber: "text-amber-600", green: "text-emerald-600" }[tone];
+  const t = STAT_TONES[tone];
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+    <Card className="lift group relative overflow-hidden p-4">
+      <div className={cn("pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-gradient-to-br to-transparent blur-2xl transition-transform duration-500 group-hover:scale-125", t.glow)} aria-hidden />
+      <div className="relative flex items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
         {label}
-        {icon && <span className="text-muted-foreground [&_svg]:size-4">{icon}</span>}
+        {icon && (
+          <span className={cn("flex size-8 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 [&_svg]:size-4", t.chip)}>
+            {icon}
+          </span>
+        )}
       </div>
-      <div className={cn("mt-2 text-2xl font-semibold tracking-tight", toneCls)}>{value}</div>
-      {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
+      <div className={cn("relative mt-2 text-2xl font-semibold tracking-tight", t.value)}>{value}</div>
+      {sub && <div className="relative mt-1 text-xs text-muted-foreground">{sub}</div>}
     </Card>
   );
 }
@@ -254,7 +276,7 @@ export function Pagination({
 }) {
   const pages = Math.max(1, Math.ceil(total / pageSize));
   return (
-    <div className="flex items-center justify-between border-t px-4 py-3 text-xs text-muted-foreground">
+    <div className="flex items-center justify-between border-t border-slate-200/70 px-4 py-3 text-xs text-muted-foreground">
       <span>
         {total === 0 ? "No results" : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total}`}
       </span>

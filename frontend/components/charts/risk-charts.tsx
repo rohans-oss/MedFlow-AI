@@ -52,7 +52,7 @@ export function ProjectionChart({ data }: { data: RiskDetail }) {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as (typeof points)[number];
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     <div className="text-muted-foreground">{shortDate(p.date)}</div>
                     <div className="mt-0.5 font-semibold">{formatNumber(Math.round(p.stock_end))} {data.unit} left</div>
                     <div className="text-muted-foreground">forecast demand {formatNumber(Math.round(p.demand))}</div>
@@ -120,7 +120,7 @@ export function PrCurveChart({ models }: { models: RiskModel[] }) {
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="rounded-lg border bg-white px-3 py-2 text-xs shadow-md">
+                  <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-xs shadow-lg shadow-teal-950/10 ring-1 ring-slate-900/5 backdrop-blur">
                     {payload.map((p) => {
                       const d = p.payload as { recall: number; precision: number; threshold: number };
                       return (
