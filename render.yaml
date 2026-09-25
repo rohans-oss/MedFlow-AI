@@ -13,9 +13,9 @@ services:
     runtime: docker
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    # Starter (0.5 CPU) seeds + trains the demo in minutes. "free" (0.1 CPU, sleeps after 15 min idle) works for the
-    # API but the first-start demo seed/training may take very long or be interrupted by the idle spin-down.
-    plan: starter
+    # Free plan: 0.1 CPU, sleeps after 15 idle minutes. The first-start demo seed/training is slow here; "starter"
+    # (0.5 CPU, paid) finishes it in minutes.
+    plan: free
     region: singapore
     healthCheckPath: /api/health
     envVars:
